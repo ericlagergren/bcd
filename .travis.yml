@@ -1,0 +1,23 @@
+language: go
+
+go:
+  - 1.9.x
+  - master
+
+matrix:
+  allow_failures:
+    - go: master
+  fast_finish: true
+
+install: true
+
+notifications:
+  email: false
+
+before_script:
+  - GO_FILES=$(find . -type f -iname '*.go')
+
+script:
+  - go vet
+  - test -z $(gofmt -s -l $GO_FILES)
+  - go test -v -tags=ddebug -timeout=12h -short -race ./...
