@@ -1,8 +1,6 @@
 package bcd
 
-import (
-	"testing"
-)
+import "testing"
 
 func TestAddSub(t *testing.T) {
 	// A mélange of tests, using setString and setUint64 as extra sanity checks.
@@ -34,6 +32,54 @@ func TestAddSub(t *testing.T) {
 wanted: %s, %s
 got   : %s, %s
 `, i, c.x, c.y, c.r, c.x, c.r, c.y, za, zs)
+		}
+	}
+}
+
+func TestMul(t *testing.T) {
+	for i, c := range [...]struct {
+		x, y, r string
+	}{
+		{"1", "12", "12"},
+		{"4", "4", "16"},
+		{"100", "100", "10000"},
+		{"123124", "12332", "1518365168"},
+		{"9999999999999999", "9999999999999999", "99999999999999980000000000000001"},
+	} {
+		x := nat(nil).setString(c.x)
+		y := nat(nil).setString(c.y)
+		r := nat(nil).setString(c.r)
+
+		z := nat(nil).mul(x, y)
+		if z.cmp(r) != 0 {
+			t.Fatalf(`#%d: %s * %s
+wanted: %s
+got   : %s
+`, i, c.x, c.y, c.r, z)
+		}
+	}
+}
+
+func TestDiv(t *testing.T) {
+	for i, c := range [...]struct {
+		x, y, q, r string
+	}{
+		{"12", "1", "12", "0"},
+		{"4", "5", "0", "4"},
+		{"25", "5", "5", "0"},
+		{"12312321434543624087245323432423412341234", "34580123616717148097544398509435", "356051978", "21326969640595703400318828928804"},
+	} {
+		x := nat(nil).setString(c.x)
+		y := nat(nil).setString(c.y)
+		rq := nat(nil).setString(c.q)
+		rr := nat(nil).setString(c.r)
+
+		q, r := nat(nil).div(nil, x, y)
+		if q.cmp(rq) != 0 || r.cmp(rr) != 0 {
+			t.Fatalf(`#%d: %s / %s
+wanted: (%s, %s)
+got   : (%s, %s)
+`, i, c.x, c.y, c.q, c.r, q, r)
 		}
 	}
 }
